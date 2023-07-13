@@ -1,0 +1,37 @@
+#version 460
+
+#ifdef GL_ES
+precision highp float;
+#endif
+
+layout(local_size_x = 8, local_size_y = 4, local_size_z = 1) in;
+
+layout(rgba32f, binding = 1) uniform image2D img_input;
+layout(rgba32f, binding = 0) uniform image2D img_output;
+
+uniform bool blurDirection;
+
+void main() {
+    ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 left, right;
+
+    if(blurDirection) {
+        left = ivec2(-1, 0);
+        right = ivec2(1, 0);
+    } else {
+        left = ivec2(0, -1);
+        right = ivec2(0, 1);
+    }
+	vec4 color0 = imageLoad(img_input, pixel_coords + 2 * left);
+	vec4 color1 = imageLoad(img_input, pixel_coords + 1 * left);
+    vec4 color2 = imageLoad(img_input, pixel_coords);
+    vec4 color3 = imageLoad(img_input, pixel_coords + 1 * right);
+	vec4 color4 = imageLoad(img_input, pixel_coords + 2 * right);
+
+    vec3 color = (color0.xyz + color1.xyz + color2.xyz + color3.xyz + color4.xyz) / 5;
+    // vec3 color = (color0.xyz + color2.xyz + color4.xyz) / 3;
+    float maxAlpha = step(0.01, color).x;
+
+    imageStore(img_output, pixel_coords, vec4(color, maxAlpha));
+	return;
+}

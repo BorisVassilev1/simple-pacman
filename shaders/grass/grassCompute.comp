@@ -1,0 +1,79 @@
+#version 460
+
+#include <simplexNoise.glsl>
+
+#ifdef GL_ES
+precision highp float;
+#endif
+
+layout(local_size_x = 8, local_size_y = 4) in;
+
+struct BladeData {
+	vec3 position;
+	float windStrength;
+    // 16
+	vec2 facing;
+	vec2 size;
+	// 32
+    uint hash;
+    // 48
+};
+
+layout(std430, binding = 1) writeonly buffer GrassData{
+    BladeData bladeData[];
+};
+
+uniform ivec2 resolution = ivec2(100, 100);
+uniform vec2 size = vec2(10, 10);
+uniform float time;
+
+uniform vec2 windDirection = normalize(vec2(1, 1));
+
+uniform mat4 anchorWorldMatrix; 
+
+uint PCGHash(inout uint seed) {
+	seed	  = seed * 747796405u + 2891336453u;
+	uint word = ((seed >> ((seed >> 28u) + 4u)) ^ seed) * 277803737u;
+	return (word >> 22u) ^ word;
+}
+
+float randomFloat(inout uint seed) { return float(PCGHash(seed)) / 4294967296.0; }
+
+float map(float value, float min1, float max1, float min2, float max2) {
+  return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+}
+
+const float PI = 3.141592;
+const float TWO_PI = 2. * PI;
+
+void main() {
+    uvec3 invID = gl_GlobalInvocationID;
+    if(invID.x >= resolution.x || invID.y >= resolution.y) return;
+    uint id = invID.x + int(resolution.x) * invID.y;
+    uint seed = id;
+
+    vec3 bladePosition;
+    bladePosition.xz = invID.xy / vec2(resolution) * size - size / 2.;
+    bladePosition.y = 0;
+    bladePosition.xz += 0.4 * vec2(randomFloat(seed), randomFloat(seed));
+
+    vec3 worldBladePosition = (anchorWorldMatrix * vec4(bladePosition, 1.0)).xyz;
+
+    float noiseValue = snoise(worldBladePosition * .1 + time * vec3(-windDirection, 0.)) * 0.5 + 0.5;
+    float noiseValue2 = snoise(worldBladePosition.xyz * .05) * TWO_PI;
+    // float noiseValue2 = 2.;
+    vec2 grassFacing = vec2(cos(noiseValue2), sin(noiseValue2));
+
+
+    float windStrength = noiseValue * 2 + 2;
+
+    float angle = randomFloat(seed) * TWO_PI;
+    vec2 facing = grassFacing + windDirection * windStrength + 0.3 * vec2(cos(angle), sin(angle));
+    facing = normalize(facing);
+
+    bladeData[id].position = bladePosition;
+    bladeData[id].hash = seed;
+    bladeData[id].windStrength = noiseValue;
+    bladeData[id].facing = facing;
+    bladeData[id].size = vec2(0.1, map(randomFloat(seed), 0, 1, 0.8, 1.5));
+}
