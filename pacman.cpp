@@ -1,6 +1,5 @@
 ﻿#include <yoghurtgl.h>
 
-
 #include <window.h>
 #include <input.h>
 #include <ecs.h>
@@ -14,42 +13,48 @@
 
 using namespace std;
 
-void run() {
-	ygl::Window window = ygl::Window(600, 800, "Test Window", true, false);
-	ygl::Mouse mouse(window);
-	
-	ygl::Scene scene;
 
-	ygl::Renderer *renderer = scene.registerSystem<ygl::Renderer>(&window);
-	ygl::AssetManager *asman = scene.getSystem<ygl::AssetManager>();
-	
-	PacmanGame *game = scene.registerSystem<PacmanGame>(std::string("./map.txt"), 21, 22);
-	
+void run() {
+	// create window
+	ygl::Window window = ygl::Window(600, 800, "Test Window", true, false);
+
+	// create scene and systems
+	ygl::Scene scene;
+	ygl::Renderer	  *renderer = scene.registerSystem<ygl::Renderer>(&window);
+	ygl::AssetManager *asman	= scene.getSystem<ygl::AssetManager>();
+	PacmanGame *game = scene.registerSystem<PacmanGame>(std::string("./resources/map.txt"), 21, 22);
+
+	// default shader for the scene
 	ygl::VFShader *defaultShader = new ygl::VFShader("./shaders/unlit.vs", "./shaders/unlit.fs");
 	renderer->setDefaultShader(asman->addShader(defaultShader, "default_shader"));
 
-	ygl::OrthographicCamera cam(21, window, 0.01, 10, ygl::Transformation(glm::vec3(0,0,1)));
+	// camera setup
+	ygl::OrthographicCamera cam(game->getWidth(), window, 0.01f, 10, ygl::Transformation(glm::vec3(0, 0, 1)));
 	cam.update();
 
-	renderer->loadData();
-
+	// disable gamma correction and color grading.
+	// engine is made so that I must modify it's source to disable it fully.
+	// this is a hack, but to fix it it will require a lot of work on the engine
 	renderer->getScreenEffect(0)->enabled = false;
 
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0);
+	// send material data to GPU
+	renderer->loadData();
+
+	// main game loop
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0);
 	while (!window.shouldClose()) {
 		window.beginFrame();
-		mouse.update();
 
 		game->doWork();
 		renderer->doWork();
 		
+		game->drawGUI();
+
 		window.swapBuffers();
 	}
 }
 
-
-int main()
-{
+int main() {
 	if (ygl::init()) {
 		dbLog(ygl::LOG_ERROR, "ygl failed to init");
 		exit(1);
