@@ -2,4 +2,4 @@
 
 Pacman game made with the [YoghurtGL](https://github.com/BorisVassilev1/yoghurtgl) engine. 
 
-![](./embed.svg)
+<img src="./embed.svg"/>
