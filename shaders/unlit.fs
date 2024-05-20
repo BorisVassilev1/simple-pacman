@@ -1,5 +1,4 @@
-#version 430
-
+#define FRAG
 #include <rendering.glsl>
 
 in vec4 vColor;
@@ -14,8 +13,8 @@ uniform sampler2D texture_sampler;
 void main() {
 	Material mat = materials[material_index];
 
-	vec4  diffuse	= texture(albedoMap, vTexCoord).xyzw;
-	vec4  calcAlbedo	= mix(vec4(mat.albedo, 1.), diffuse, mat.use_albedo_map);
-	
+	vec4 diffuse = texture(albedoMap, vTexCoord).xyzw;
+	vec4 calcAlbedo = mix(vec4(mat.albedo, 1.), diffuse, mat.use_albedo_map);
+
 	fragColor = calcAlbedo;
 }

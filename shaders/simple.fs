@@ -1,4 +1,4 @@
-#version 430
+#define FRAG
 
 #include <rendering.glsl>
 
@@ -20,7 +20,7 @@ void main() {
 
 		normal = normalize(normal * 2. - 1.);
 
-		finalNormal = normalize(vTBN * normal);
+		finalNormal = normalize(mix(vVertexNormal, vTBN * normal, mat.use_normal_map));
 	} else {
 		finalNormal = normalizedVertexNormal;
 	}
@@ -30,9 +30,10 @@ void main() {
 	if (!gl_FrontFacing) finalNormal = -finalNormal;
 	color = calcAllLights(vVertexPos, finalNormal, finalNormal, vTexCoord);
 
-	// light = vec3(materials[material_index].albedo);
+	// color = vec3(materials[material_index].albedo);
 	// color = vVertexNormal;
 	// color = vVertexPos;
+	// color = vColor.xyz;
 
 	fragColor = vec4(color, 1.0);
 }

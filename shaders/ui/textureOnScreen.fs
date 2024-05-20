@@ -1,5 +1,3 @@
-#version 460
-
 in vec3 outVertexPos;
 in vec2 outTexCoord;
 

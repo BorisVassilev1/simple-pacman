@@ -1,4 +1,5 @@
 #include "pacman-game.h"
+#include <yoghurtgl.h>
 #include <material.h>
 #include <input.h>
 
@@ -81,7 +82,7 @@ void PacmanGame::createMap(ygl::Renderer *renderer, ygl::AssetManager *asman) {
 	currentDots = allDots;
 
 	// create map texture
-	mapTexture = new ygl::Texture2d(width, height, ygl::ITexture::Type::RGBA, buff);
+	mapTexture = new ygl::Texture2d(width, height, ygl::TextureType::RGBA16F, buff);
 	mapTexture->bind();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -118,7 +119,7 @@ void PacmanGame::createMap(ygl::Renderer *renderer, ygl::AssetManager *asman) {
 // creates the player entity (Pacman)
 void PacmanGame::createPacman(ygl::Renderer *renderer, ygl::AssetManager *asman) {
 	// texture
-	ygl::Texture2d *pacmanTexture = new ygl::Texture2d("./resources/pacman.png", ygl::ITexture::Type::SRGBA);
+	ygl::Texture2d *pacmanTexture = new ygl::Texture2d("./resources/pacman.png", ygl::TextureType::SRGBA8);
 	pacmanTexture->bind();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -177,12 +178,12 @@ float PacmanGame::generateGhostSpeed() {
 // creates all the ghosts, marked on the map
 void PacmanGame::createGhosts(ygl::Renderer *renderer, ygl::AssetManager *asman) {
 	// textures
-	ygl::Texture2d *ghostTextureMask = new ygl::Texture2d("./resources/ghost_mask.png", ygl::ITexture::Type::SRGBA);
+	ygl::Texture2d *ghostTextureMask = new ygl::Texture2d("./resources/ghost_mask.png", ygl::TextureType::SRGBA8);
 	ghostTextureMask->bind();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	ghostTextureMask->unbind();
-	ygl::Texture2d *ghostTextureEyes = new ygl::Texture2d("./resources/ghost_eyes.png", ygl::ITexture::Type::SRGBA);
+	ygl::Texture2d *ghostTextureEyes = new ygl::Texture2d("./resources/ghost_eyes.png", ygl::TextureType::SRGBA8);
 	ghostTextureEyes->bind();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -335,8 +336,8 @@ glm::ivec2 PacmanGame::getMapVector(Direction dir) {
 		case RIGHT: return glm::ivec2(1, 0);
 		case UP: return glm::ivec2(0, -1);
 		case DOWN: return glm::ivec2(0, 1);
+		case NONE: return glm::ivec2(0, 0);
 	}
-	return glm::ivec2(0, 0);
 }
 // gets the unit vector of a direction (in world coordinates)
 glm::vec2 PacmanGame::getWorldVector(Direction dir) {
@@ -345,8 +346,8 @@ glm::vec2 PacmanGame::getWorldVector(Direction dir) {
 		case RIGHT: return glm::vec2(1, 0);
 		case UP: return glm::vec2(0, 1);
 		case DOWN: return glm::vec2(0, -1);
+		case NONE: return glm::ivec2(0, 0);
 	}
-	return glm::ivec2(0, 0);
 }
 
 // checks in a direction from a given position
@@ -409,6 +410,7 @@ void PacmanGame::updatePacmanEntity(PacmanEntityData &data, ygl::Transformation 
 		case DOWN: transform.rotation.z = M_PI / 2; break;
 		case LEFT: transform.rotation.z = 0; break;
 		case RIGHT: transform.rotation.z = M_PI; break;
+		case NONE: transform.rotation.z = 0; break;
 	}
 
 	// move in a direction
@@ -506,6 +508,7 @@ void PacmanGame::ghostAI(ygl::Entity e, ygl::Transformation &transform, PacmanEn
 		case State::CHASE: resolveAIState(distanceMap, position, start, data, ::go_to_target); break;
 		case State::RUN: resolveAIState(distanceMap, position, start, data, ::run_from_target); break;
 		case State::GO_HOME: resolveAIState(homeDistanceMap, position, start, data, ::go_to_target); break;
+		case State::STAY: break;
 	}
 }
 
@@ -687,7 +690,7 @@ void TextCentered(std::string text) {
 
 	ImGui::SameLine(text_indentation);
 	ImGui::PushTextWrapPos(win_width - text_indentation);
-	ImGui::TextWrapped(text.c_str());
+	ImGui::TextWrapped("%s", text.c_str());
 	ImGui::PopTextWrapPos();
 }
 

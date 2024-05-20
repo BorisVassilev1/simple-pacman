@@ -7,12 +7,12 @@
 #include <camera.h>
 #include <entities.h>
 #include <shader.h>
+#include <asset_manager.h>
 #include "game/pacman-game.h"
 
 #include <glm/gtx/string_cast.hpp>
 
 using namespace std;
-
 
 void run() {
 	// create window
@@ -30,6 +30,7 @@ void run() {
 
 	// camera setup
 	ygl::OrthographicCamera cam(game->getWidth(), window, 0.01f, 10, ygl::Transformation(glm::vec3(0, 0, 1)));
+	renderer->setMainCamera(&cam);
 	cam.update();
 
 	// disable gamma correction and color grading.

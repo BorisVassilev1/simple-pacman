@@ -5,11 +5,14 @@
 #include <entities.h>
 #include <texture.h>
 #include <timer.h>
+#include <renderer.h>
 
 #include <cerrno>
 #include <cstring>
 #include <string>
 #include <fstream>
+
+#include <imgui.h>
 
 // global default game settings.
 struct PacmanGameSettings {

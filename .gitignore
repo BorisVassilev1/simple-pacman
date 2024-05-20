@@ -1,6 +1,12 @@
-.vs/*
-out/*
+.vs/
+out/
 *.png
 *.exe
 *.ilk
 *.pdb
+build/
+build-win/
+*.so
+pacman
+.cache/
+*.ini

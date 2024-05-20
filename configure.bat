@@ -1,0 +1,1 @@
+cmake -S ./ -B ./build-win/ -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -G "MinGW Makefiles" -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Release 

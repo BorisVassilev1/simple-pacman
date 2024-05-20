@@ -1,9 +1,13 @@
-#define VERT
-#include <rendering.glsl>
+precision highp float;
 
-out vec4 vColor;
-out vec2 vTexCoord;
-out vec3 vVertexNormal;
+layout(location = 0) in vec3 position;
+
+layout(std140) uniform Matrices {
+	mat4 projectionMatrix;
+	mat4 viewMatrix;
+	mat4 cameraWorldMatrix;
+};
+
 out vec3 vVertexPos;
 
 uniform mat4 worldMatrix;
@@ -14,8 +18,5 @@ void main() {
 	gl_PointSize = 5.0;
 	gl_Position = projectionMatrix * viewMatrix * mvPos;
 	
-	vColor = color;
-	vTexCoord = texCoord;
-	vVertexNormal = normalize(worldMatrix * vec4(normal, 0.0)).xyz;
     vVertexPos = mvPos.xyz;
 }
