@@ -1,6 +1,5 @@
 .vs/
 out/
-*.png
 *.exe
 *.ilk
 *.pdb
