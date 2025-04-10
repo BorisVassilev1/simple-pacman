@@ -670,8 +670,8 @@ PacmanGame::~PacmanGame() {
 	deleteMap(homeDistanceMap, width, height);
 }
 
-void PacmanGame::write(std::ostream &out){THROW_RUNTIME_ERR("SERIALIZING A PACMAN GAME IS NOT SUPPORTED")};
-void PacmanGame::read(std::istream &in){THROW_RUNTIME_ERR("SERIALIZING A PACMAN GAME IS NOT SUPPORTED")};
+void PacmanGame::write(std::ostream &){THROW_RUNTIME_ERR("SERIALIZING A PACMAN GAME IS NOT SUPPORTED")};
+void PacmanGame::read(std::istream &){THROW_RUNTIME_ERR("SERIALIZING A PACMAN GAME IS NOT SUPPORTED")};
 
 // copy-pasta from https://stackoverflow.com/questions/64653747/how-to-center-align-text-horizontally
 // has some bugs, but I am willing to allow uncentered text. It is a feature :D
