@@ -10,17 +10,38 @@ if (POLICY CMP0141)
 endif()
 
 if (NOT MSVC)
-	set(COMPILE_ARGS -Wall -std=c++20 -O3)
+	set(COMPILE_ARGS -Wall -std=c++23 -O3)
 else (NOT MSVC)
-	set(COMPILE_ARGS -O3 -std=c++20)
+	set(COMPILE_ARGS -O3 -std=c++23)
 endif (NOT MSVC)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project ("pacman")
 
 set(YGL_STATIC ON)
 set(YGL_NO_ASSIMP ON)
 add_subdirectory("./lib/yoghurtgl")
+
+if(WIN32)
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O3")
+	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "")
+else(WIN32)
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-fPIC -stdlib=libc++ -O3")
+	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-fPIC")
+endif (WIN32)
+
+if (MSVC)
+	set(COMPILE_ARGS /Wall)
+else ()
+	set(COMPILE_ARGS
+		#-fsanitize=address
+	)
+	set(LINK_ARGS
+		#-fsanitize=address
+	)
+	set(COMPILE_ARGS ${COMPILE_ARGS} -Wall -Wpedantic --pedantic-errors -g -O3 -std=c++2a)
+endif ()
 
 add_executable (pacman "pacman.cpp" "game/pacman-game.h" "game/pacman-game.cpp")
 add_definitions(-DYGL_NO_ASSIMP)
@@ -38,9 +59,5 @@ else (MSVC)
 	)
 endif (MSVC)
 
+target_compile_options(pacman PRIVATE ${COMPILE_ARGS} -fdata-sections -ffunction-sections)
 target_link_options(pacman PRIVATE ${COMPILE_ARGS} -fdata-sections -dead-strip -ffunction-sections -Wl,--gc-sections)
-
-#if (CMAKE_VERSION VERSION_GREATER 3.12)
-#  set_property(TARGET pacman PROPERTY CXX_STANDARD 20)
-#endif()
-
