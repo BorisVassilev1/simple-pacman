@@ -7,5 +7,6 @@ build/
 build-win/
 *.so
 pacman
+msgBox
 .cache/
 *.ini

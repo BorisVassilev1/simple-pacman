@@ -40,6 +40,9 @@ void run() {
 
 	// send material data to GPU
 	renderer->loadData();
+	dbLog(ygl::LOG_INFO, "PID: ", getpid());
+	dbLog(ygl::LOG_ERROR, "PID: ", YGL_LOG_LEVEL);
+	dbLog(ygl::LOG_ERROR, "ERROR");
 
 	// main game loop
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0);
