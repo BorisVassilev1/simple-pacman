@@ -33,16 +33,8 @@ void run() {
 	renderer->setMainCamera(&cam);
 	cam.update();
 
-	// disable gamma correction and color grading.
-	// engine is made so that I must modify it's source to disable it fully.
-	// this is a hack, but to fix it it will require a lot of work on the engine
-	renderer->getScreenEffect(0)->enabled = false;
-
 	// send material data to GPU
 	renderer->loadData();
-	dbLog(ygl::LOG_INFO, "PID: ", getpid());
-	dbLog(ygl::LOG_ERROR, "PID: ", YGL_LOG_LEVEL);
-	dbLog(ygl::LOG_ERROR, "ERROR");
 
 	// main game loop
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0);
